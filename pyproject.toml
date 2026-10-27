@@ -1,0 +1,73 @@
+[project]
+name = "mars"
+version = "0.3.0"
+description = "Mars: an Agentic AI-only multi-agent research system - fixed domain, canonical tracks, cited and audited reports."
+readme = "README.md"
+authors = [
+  { name = "Prateek Thambad", email = "thambadp@gmail.com" }
+]
+requires-python = ">=3.13"
+dependencies = [
+  "crewai[tools]>=1.15.28",
+  "langchain-openrouter>=0.2.9",
+  "streamlit>=1.66.0",
+  "httpx>=0.28",
+  "beautifulsoup4>=4.13",
+  "typer>=0.15",
+  "rich>=13.0",
+  "plotly>=5.24",
+  "markdown2>=2.5",
+  "weasyprint>=62.0",
+  "cryptography>=42.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0",
+  "pytest-cov>=6.0",
+  "ruff>=0.6",
+]
+
+[project.scripts]
+mars = "mars.cli:main"
+mars-ui = "mars.app:main"
+
+[build-system]
+requires = ["uv_build>=0.12.19,<0.13.0"]
+build-backend = "uv_build"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+filterwarnings = ["ignore::DeprecationWarning"]
+markers = [
+  "live: opt-in tests that call real external services (skipped by default)",
+  "chaos: fault-injection tests that exercise failure paths",
+]
+addopts = "-m 'not live'"
+
+[tool.coverage.run]
+source = ["mars"]
+
+[tool.coverage.report]
+fail_under = 70
+show_missing = true
+skip_covered = true
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+
+[tool.ruff.lint]
+# An explicit, stable rule set - the point is to catch mistakes, not to
+# reformat the codebase.
+select = ["E4", "E7", "E9", "F", "I", "UP", "B", "C4", "RUF"]
+ignore = [
+  "E402",   # module level imports after the env setup in mars/__init__.py
+  "B008",   # typer uses function calls in argument defaults on purpose
+  "RUF012", # pydantic models need mutable class attributes
+  "RUF022", # __all__ is grouped by meaning, not alphabetically
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["B011"]

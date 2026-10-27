@@ -1,0 +1,21 @@
+# Build context hygiene: never ship credentials, local artefacts or caches.
+.git
+.gitignore
+.venv
+.env
+.env.*
+!.env.example
+__pycache__
+*.py[cod]
+.pytest_cache
+.ruff_cache
+.mypy_cache
+.coverage
+htmlcov
+research_output
+mars_live
+.mars_approvals
+MISC
+tests
+Dockerfile
+docker-compose.yml

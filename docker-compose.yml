@@ -1,0 +1,51 @@
+services:
+  mars-ui:
+    build: .
+    image: mars:0.3.0
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      MARS_CACHE_DIR: /data/mars/cache
+      MARS_STATE_DIR: /data/mars/runs
+      MARS_OUTPUT_DIR: /data/mars/research_output
+      MARS_DEAD_LETTER_DIR: /data/mars/dead_letters
+      MARS_OBSERVABILITY_DIR: /data/mars/traces
+      MARS_APPROVAL_DIR: /data/mars/approvals
+    ports:
+      - "8501:8501"
+    volumes:
+      - mars-data:/data/mars
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8501/_stcore/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  mars-health:
+    build: .
+    image: mars:0.3.0
+    restart: unless-stopped
+    command: ["mars", "serve", "--host", "0.0.0.0", "--port", "8080"]
+    env_file:
+      - .env
+    environment:
+      MARS_CACHE_DIR: /data/mars/cache
+      MARS_STATE_DIR: /data/mars/runs
+      MARS_OUTPUT_DIR: /data/mars/research_output
+      MARS_DEAD_LETTER_DIR: /data/mars/dead_letters
+      MARS_OBSERVABILITY_DIR: /data/mars/traces
+    ports:
+      - "8080:8080"
+    volumes:
+      - mars-data:/data/mars
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8080/readyz"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  mars-data:
